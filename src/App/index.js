@@ -1,28 +1,64 @@
 import React from 'react';
 import { AppUI } from './AppUI';
 
-// import './App.css';
-
 // const defaultTodos = [
-//   { text: 'Cortar cebolla', completed: false },
+//   { text: 'Cortar cebolla', completed: true },
 //   { text: 'Tomar el cursso de intro a React', completed: false },
-//   { text: 'Llorar con la llorona', completed: false },
-//   { text: 'Pelear con la peleona', completed: false },
+//   { text: 'Llorar con la llorona', completed: true },
+//   { text: 'LALALALAA', completed: false },
 // ];
+
+
+
+
+
+
+
+
+
+
+
+
+//Podemos crear nuestros propios Custom React Hooks
+function useLocalStorage(itemName, initialValue) {
+
+  const localStorageItem = localStorage.getItem(itemName);
+  let parsedItem;
+
+  if (!localStorageItem) {
+    localStorage.setItem(itemName, JSON.stringify(initialValue));
+    parsedItem = initialValue;
+  } else {
+    parsedItem = JSON.parse(localStorageItem);
+  }
+
+  const [item, setItem] = React.useState(parsedItem);
+
+  const saveItem = (newItem) => {
+    const stringifiedItem = JSON.stringify(newItem);
+    localStorage.setItem(itemName, stringifiedItem);
+    setItem(newItem);
+  };
+
+  return [
+    item,
+    saveItem,
+  ];
+}
+
+
+
+
+
+
+
+
+
+
 
 function App() {
 
-  const localStorageTodos = localStorage.getItem('TODOS_V1')
-  let parsedTodos
-
-  if (!localStorageTodos) {
-    localStorage.setItem('TODOS_V1', JSON.stringify([]))
-    parsedTodos = []
-  } else {
-    parsedTodos = JSON.parse(localStorageTodos)
-  }
-
-  const [todos, setTodos] = React.useState(parsedTodos);
+  const [todos, saveTodos] = useLocalStorage('TODOS_V1', []);
   const [searchValue, setSearchValue] = React.useState('');
 
   const completedTodos = todos.filter(todo => !!todo.completed).length;
@@ -38,12 +74,6 @@ function App() {
       const searchText = searchValue.toLowerCase();
       return todoText.includes(searchText);
     });
-  }
-
-  const saveTodos = (newTodos) => {
-    const stringifiedTodos = JSON.stringify(newTodos)
-    localStorage.setItem('TODOS_V1', stringifiedTodos)
-    setTodos(newTodos)
   }
 
   const completeTodo = (text) => {
@@ -62,15 +92,15 @@ function App() {
 
   return (
     <AppUI
-    totalTodos={totalTodos}
-    completedTodos={completedTodos}
-    searchValue={searchValue}
-    setSearchValue={setSearchValue}
-    searchedTodos={searchedTodos}
-    completeTodo={completeTodo}
-    deleteTodo={deleteTodo}
+      totalTodos={totalTodos}
+      completedTodos={completedTodos}
+      searchValue={searchValue}
+      setSearchValue={setSearchValue}
+      searchedTodos={searchedTodos}
+      completeTodo={completeTodo}
+      deleteTodo={deleteTodo}
     />
-  );
+  )
 }
 
 export default App;
